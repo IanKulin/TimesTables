@@ -7,23 +7,39 @@
 
 import SwiftUI
 
+enum HCS: String {
+    case operand = "Operand"
+    case markerFeltWide = "Marker Felt Wide"
+}
+
 struct ContentView: View {
     
-    @State private var tablesSelection = 5
+    @State private var tablesSelection =
+     (UserDefaults.standard.integer(forKey: HCS.operand.rawValue) != 0) ? UserDefaults.standard.integer(forKey: HCS.operand.rawValue) : 5
     @State private var calculatorDisplay = " "
-    @State private var questionText = "5 x 3 = "
+    @State private var questionText = ""
     @State private var answer = 0
     @State private var showingResponseText = false
+    @State private var showingError = false
+    @State private var titleAnimationAmount: CGFloat = 1
     
     var body: some View {
+        // TODO: deal with landscape
         VStack {
-            Text("Select a times table to practice").padding()
+            Text("Times Tables!")
+                .padding()
+                .font(.custom(HCS.markerFeltWide.rawValue,
+                        fixedSize: 36))
+                .scaleEffect(titleAnimationAmount)
+                .animation(
+                    .linear(duration: 3.0)
+                        .delay(0.2),
+                    value: titleAnimationAmount)
             Picker("Operand", selection: $tablesSelection) {
                 ForEach(2..<13) { i in
                     Image(systemName: "\(i).circle").tag(i)
                         .rotationEffect(Angle(degrees:90))
                 }
-                
             }
             .pickerStyle(WheelPickerStyle())
             .scaleEffect(2)
@@ -31,6 +47,8 @@ struct ContentView: View {
             .frame(width:.infinity, height:80)
             .clipped()
             .onChange(of: tablesSelection) { _ in
+                UserDefaults.standard.set(self.tablesSelection,
+                                          forKey: HCS.operand.rawValue)
                 generateTable()
             }
             Spacer()
@@ -38,10 +56,10 @@ struct ContentView: View {
             Spacer()
             Divider()
             Text(calculatorDisplay)
-                .font(.largeTitle)
-                .frame(width: 275) //TODO: make scalable
-                .background(Color.black) //TODO: make default background colour
-                .foregroundColor(.green)
+                .font(.system(size: 40))
+                .frame(width: 350, height: 80) //TODO: make scalable
+                .background(Color.primary)
+                .foregroundColor(showingError ? .red : .green)
             Spacer()
             
             NumPad()
@@ -62,7 +80,10 @@ struct ContentView: View {
         if showingResponseText {
             calculatorDisplay = ""
             showingResponseText = false
+            // if they hit enter when showing a response don't process it
+            if button == "↩️" { return }
         }
+        showingError = false
         // delete any leading space
         if calculatorDisplay == " " {calculatorDisplay = ""}
         switch button {
@@ -95,16 +116,19 @@ struct ContentView: View {
             if userAnswer == answer {
                 calculatorDisplay = "Correct!"
                 showingResponseText = true
+                showingError = false
+                notifySuccess()
             }
             else
             {
                 calculatorDisplay = "No,  \(questionText)\(answer)"
                 showingResponseText = true
+                showingError = true
+                notifyFailure()
             }
             withAnimation{
                 generateTable()
             }
-
         default:
             fatalError("Unexpected button")
         }
@@ -112,9 +136,7 @@ struct ContentView: View {
     
     
     fileprivate func NumPad() -> some View {
-        //num pad keyboard
         VStack {
-
             HStack {
                 Button("7️⃣"){buttonPressed("7️⃣")}
                 Button("8️⃣"){buttonPressed("8️⃣")}
@@ -138,19 +160,36 @@ struct ContentView: View {
         }.font(.system(size: 80)) //TODO: make scalable
     }
     
+    fileprivate func notifySuccess() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+        if titleAnimationAmount < 2.0 {
+            titleAnimationAmount *= 1.1
+        }
+    }
+    
+    fileprivate func notifyFailure() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
+        if titleAnimationAmount > 0.1 {
+            titleAnimationAmount *= 0.9
+        }
+    }
+    
+    
 }
     
     
-    fileprivate func createTablesQuestion(for operand: Int) -> (answer: Int, question: String) {
-        let operandInFirstPlace = Bool.random()
-        let otherOperand = Int.random(in: 2...12)
-        return (operand*otherOperand,
-                operandInFirstPlace ? "\(operand) x \(otherOperand) = " : "\(otherOperand) x \(operand) = ")
+fileprivate func createTablesQuestion(for operand: Int) -> (answer: Int, question: String) {
+    let operandInFirstPlace = Bool.random()
+    let otherOperand = Int.random(in: 2...12)
+    return (operand*otherOperand,
+            operandInFirstPlace ? "\(operand) x \(otherOperand) = " : "\(otherOperand) x \(operand) = ")
+}
+
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
     }
-    
-    
-    struct ContentView_Previews: PreviewProvider {
-        static var previews: some View {
-            ContentView()
-        }
-    }
+}

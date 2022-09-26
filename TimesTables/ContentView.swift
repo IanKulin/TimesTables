@@ -139,6 +139,7 @@ struct ContentView: View {
             RoundedRectangle(cornerRadius: 40)
                 .fill(.red)
                 .padding(30)
+                .frame(maxHeight: 400)
             VStack {
                 // some cute animations
                 // some text with the scores
@@ -158,7 +159,7 @@ struct ContentView: View {
                     showRoundResults = false
                     numCompletedQuestions = 0
                     numCorrectQuestions = 0
-                    print("Close button event")
+                    titleAnimationAmount = 1
                 }
                 .foregroundColor(.white)
                 .buttonStyle(.borderedProminent)
@@ -171,7 +172,10 @@ struct ContentView: View {
     
     
     fileprivate func generateTable() {
-        let tablesQuestion = createTablesQuestion(for: tablesSelection)
+        var tablesQuestion = createTablesQuestion(for: tablesSelection)
+        while tablesQuestion.question == questionText {
+            tablesQuestion = createTablesQuestion(for: tablesSelection)
+        }
         questionText = tablesQuestion.question
         answer = tablesQuestion.answer
     }
@@ -202,30 +206,19 @@ struct ContentView: View {
         // delete any leading space
         if calculatorDisplay == " " {calculatorDisplay = ""}
         switch button {
-        case "0️⃣":
-            calculatorDisplay += "0"
-        case "1️⃣":
-            calculatorDisplay += "1"
-        case "2️⃣":
-            calculatorDisplay += "2"
-        case "3️⃣":
-            calculatorDisplay += "3"
-        case "4️⃣":
-            calculatorDisplay += "4"
-        case "5️⃣":
-            calculatorDisplay += "5"
-        case "6️⃣":
-            calculatorDisplay += "6"
-        case "7️⃣":
-            calculatorDisplay += "7"
-        case "8️⃣":
-            calculatorDisplay += "8"
-        case "9️⃣":
-            calculatorDisplay += "9"
+        case "0️⃣": calculatorDisplay += "0"
+        case "1️⃣": calculatorDisplay += "1"
+        case "2️⃣": calculatorDisplay += "2"
+        case "3️⃣": calculatorDisplay += "3"
+        case "4️⃣": calculatorDisplay += "4"
+        case "5️⃣": calculatorDisplay += "5"
+        case "6️⃣": calculatorDisplay += "6"
+        case "7️⃣": calculatorDisplay += "7"
+        case "8️⃣": calculatorDisplay += "8"
+        case "9️⃣": calculatorDisplay += "9"
         case "🔙":
             calculatorDisplay = String(calculatorDisplay.dropLast(1))
             if calculatorDisplay == "" {calculatorDisplay = " "}
-            showingResponseText = true
         case "↩️":
             numCompletedQuestions += 1
             let userAnswer = Int(calculatorDisplay) ?? 0

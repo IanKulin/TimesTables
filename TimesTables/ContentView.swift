@@ -36,7 +36,9 @@ struct ContentView: View {
     var body: some View {
         // TODO: deal with landscape
         ZStack {
+            
             mainView()
+                .background(Gradient(colors: [.white, Color(red: 0.92, green: 0.97, blue: 1.00)]))
             resultsView().opacity(showRoundResults ? 0.9 : 0.0)
         }
         .onAppear(perform: generateTable)
@@ -111,28 +113,100 @@ struct ContentView: View {
     fileprivate func numPadView() -> some View {
         VStack {
             HStack {
-                Button("7️⃣"){buttonPressed("7️⃣")}
-                Button("8️⃣"){buttonPressed("8️⃣")}
-                Button("9️⃣"){buttonPressed("9️⃣")}
+                Spacer()
+                numberButtonView(7).onTapGesture { buttonPressed("7") }
+                Spacer()
+                numberButtonView(8).onTapGesture { buttonPressed("8") }
+                Spacer()
+                numberButtonView(9).onTapGesture { buttonPressed("9") }
+                Spacer()
             }
             HStack {
-                Button("4️⃣"){buttonPressed("4️⃣")}
-                Button("5️⃣"){buttonPressed("5️⃣")}
-                Button("6️⃣"){buttonPressed("6️⃣")}
+                Spacer()
+                numberButtonView(4).onTapGesture { buttonPressed("4") }
+                Spacer()
+                numberButtonView(5).onTapGesture { buttonPressed("5") }
+                Spacer()
+                numberButtonView(6).onTapGesture { buttonPressed("6") }
+                Spacer()
             }
             HStack {
-                Button("1️⃣"){buttonPressed("1️⃣")}
-                Button("2️⃣"){buttonPressed("2️⃣")}
-                Button("3️⃣"){buttonPressed("3️⃣")}
+                Spacer()
+                numberButtonView(1).onTapGesture { buttonPressed("1") }
+                Spacer()
+                numberButtonView(2).onTapGesture { buttonPressed("2") }
+                Spacer()
+                numberButtonView(3).onTapGesture { buttonPressed("3") }
+                Spacer()
             }
             HStack {
-                Button("0️⃣"){buttonPressed("0️⃣")}
-                Button("🔙"){buttonPressed("🔙")}
-                Button("↩️"){buttonPressed("↩️")}
+                Spacer()
+                deleteButtonView().onTapGesture { buttonPressed("🔙") }
+                Spacer()
+                numberButtonView(0).onTapGesture { buttonPressed("2") }
+                Spacer()
+                returnButtonView().onTapGesture { buttonPressed("↩️") }
+                Spacer()
             }
-        }.font(.system(size: 80)) //TODO: make scalable
+        }
+        .font(.system(size: 80))
+
+        
     }
 
+    
+    fileprivate func numberButtonView(_ number: Int) -> some View {
+        ZStack{
+            let circleSize = 90.0
+            buttonCircleView(circleSize)
+            Text("\(number)")
+                .font(.system(size: circleSize/2.8))
+                .fontWeight(.heavy)
+        }
+    }
+    
+    
+    fileprivate func deleteButtonView() -> some View {
+        ZStack{
+            buttonCircleView(90.0)
+            // and bold number
+            Image(systemName: "delete.left")
+                .scaleEffect(0.42)
+        }
+    }
+    
+    
+    fileprivate func returnButtonView() -> some View {
+        ZStack{
+                Circle()
+                    .fill(Color(red: 0.93, green: 0.64, blue: 0.27))
+                    .frame(width: 88, height: 88)
+            
+            Circle()
+                .strokeBorder(Color(red: 0.93, green: 0.64, blue: 0.27), lineWidth: 2)
+                .frame(width: 108, height: 108)
+            
+            // and bold number
+            Image(systemName: "arrowshape.turn.up.left.fill")
+                .scaleEffect(0.4)
+                .foregroundColor(Color(.white))
+        }
+    }
+    
+    
+    fileprivate func buttonCircleView(_ size: CGFloat) -> some View {
+        ZStack {
+            // light blue circle
+            Circle()
+                .fill(Color(red: 0.80, green: 0.92, blue: 1.0))
+            // with black border
+            Circle()
+                .strokeBorder(.black, lineWidth: 2)
+        }
+        .frame(width: size, height: size)
+    }
+    
+    
     
     fileprivate func resultsView() -> some View {
         ZStack {
@@ -206,16 +280,16 @@ struct ContentView: View {
         // delete any leading space
         if calculatorDisplay == " " {calculatorDisplay = ""}
         switch button {
-        case "0️⃣": calculatorDisplay += "0"
-        case "1️⃣": calculatorDisplay += "1"
-        case "2️⃣": calculatorDisplay += "2"
-        case "3️⃣": calculatorDisplay += "3"
-        case "4️⃣": calculatorDisplay += "4"
-        case "5️⃣": calculatorDisplay += "5"
-        case "6️⃣": calculatorDisplay += "6"
-        case "7️⃣": calculatorDisplay += "7"
-        case "8️⃣": calculatorDisplay += "8"
-        case "9️⃣": calculatorDisplay += "9"
+        case "0": calculatorDisplay += "0"
+        case "1": calculatorDisplay += "1"
+        case "2": calculatorDisplay += "2"
+        case "3": calculatorDisplay += "3"
+        case "4": calculatorDisplay += "4"
+        case "5": calculatorDisplay += "5"
+        case "6": calculatorDisplay += "6"
+        case "7": calculatorDisplay += "7"
+        case "8": calculatorDisplay += "8"
+        case "9": calculatorDisplay += "9"
         case "🔙":
             calculatorDisplay = String(calculatorDisplay.dropLast(1))
             if calculatorDisplay == "" {calculatorDisplay = " "}
